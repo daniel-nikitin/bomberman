@@ -1,18 +1,32 @@
 import arcade
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+ROWS = 10
+COLUMNS = 15
+TILE_SIZE = 60
 SCREEN_TITLE = 'bomberman(work in progress)'
 
 
 class Game(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.bomberman = Bomberman(100, 100)
+        self.bomberman = Bomberman(width / 2, height / 2)
+        self.bg = arcade.load_texture('Blocks/BackgroundTile.png')
 
     def on_draw(self):
         self.clear()
+        self.draw_bg()
         self.bomberman.draw()
+
+    def draw_bg(self):
+        for y in range(ROWS):
+            for x in range(COLUMNS):
+                arcade.draw_texture_rectangle(
+                    center_x=TILE_SIZE * x + TILE_SIZE / 2,
+                    center_y=TILE_SIZE * y + TILE_SIZE / 2,
+                    width=TILE_SIZE,
+                    height=TILE_SIZE,
+                    texture=self.bg
+                )
 
     def on_key_press(self, symbol: int, modifiers: int):
 
@@ -93,7 +107,7 @@ class Bomberman(arcade.Sprite):
                 self.set_texture(self.pose)
                 self.time = 0
 
-            speed = 2
+            speed = 2.5
             if self.navigation == 1:
                 self.center_y = self.center_y + speed
 
@@ -130,5 +144,5 @@ class Bomberman(arcade.Sprite):
         self.moving = False
 
 
-window = Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+window = Game(TILE_SIZE * COLUMNS, TILE_SIZE * ROWS, SCREEN_TITLE)
 arcade.run()
