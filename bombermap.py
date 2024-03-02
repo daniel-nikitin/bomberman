@@ -1,21 +1,37 @@
 import arcade
 
-ROWS = 10
+ROWS = 9
 COLUMNS = 15
-TILE_SIZE = 60
+TILE_SIZE = 90
 SCREEN_TITLE = 'bomberman(work in progress)'
+P1_SPEED = 2.5
+P2_SPEED = 2.5
 
 
 class Game(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.bomberman = Bomberman(width / 2, height / 2)
+        self.bomberman = Bomberman(width / 2, height / 2, P1_SPEED)
         self.bg = arcade.load_texture('Blocks/BackgroundTile.png')
+        self.solidlist = arcade.SpriteList()
+        # self.bomberman = arcade.SpriteList
+        self.create_solidB()
 
     def on_draw(self):
         self.clear()
         self.draw_bg()
+        self.solidlist.draw()
         self.bomberman.draw()
+        self.bomberman.draw_hit_box()
+
+    def create_solidB(self):
+        for y in range(10):
+            for x in range(15):
+                if x % 2 == 1 and y % 2 == 1:
+                    block = Solid()
+                    block.center_x = TILE_SIZE * x + TILE_SIZE / 2
+                    block.center_y = TILE_SIZE * y + TILE_SIZE / 2
+                    self.solidlist.append(block)
 
     def draw_bg(self):
         for y in range(ROWS):
@@ -59,15 +75,35 @@ class Game(arcade.Window):
         if self.bomberman.bottom < 0 and self.bomberman.navigation == 3:
             self.bomberman.stop()
 
+        solids = arcade.check_for_collision_with_list(self.bomberman, self.solidlist)
+        if len(solids) > 0:
+            for block in solids:
+
+                if self.bomberman.left < block.right < self.bomberman.right and self.bomberman.navigation == 4:
+                    self.bomberman.stop()
+                    # self.bomberman.left = block.right
+
+                if self.bomberman.left < block.left < self.bomberman.right and self.bomberman.navigation == 2:
+                    self.bomberman.stop()
+
+                if self.bomberman.bottom < block.bottom < self.bomberman.top and self.bomberman.navigation == 1:
+                    self.bomberman.stop()
+
+                if self.bomberman.bottom < block.top < self.bomberman.top and self.bomberman.navigation == 3:
+                    self.bomberman.stop()
+            # arcade.colli
+            # self.bomberman.stop()
+
         self.bomberman.oopdate(delta_time)
 
 
 class Bomberman(arcade.Sprite):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, s):
         super().__init__(filename="Bomberman/Front/Bman_F_f00.png", scale=1)
         self.center_y = y
         self.center_x = x
+        self.speed = s
         self.pose = 0
         self.time = 0
         self.moving = False
@@ -107,18 +143,17 @@ class Bomberman(arcade.Sprite):
                 self.set_texture(self.pose)
                 self.time = 0
 
-            speed = 2.5
             if self.navigation == 1:
-                self.center_y = self.center_y + speed
+                self.center_y = self.center_y + self.speed
 
             if self.navigation == 3:
-                self.center_y = self.center_y - speed
+                self.center_y = self.center_y - self.speed
 
             if self.navigation == 2:
-                self.center_x = self.center_x + speed
+                self.center_x = self.center_x + self.speed
 
             if self.navigation == 4:
-                self.center_x = self.center_x - speed
+                self.center_x = self.center_x - self.speed
 
     def go_back(self):
         self.navigation = 1
@@ -144,5 +179,20 @@ class Bomberman(arcade.Sprite):
         self.moving = False
 
 
-window = Game(TILE_SIZE * COLUMNS, TILE_SIZE * ROWS, SCREEN_TITLE)
+class Bomb(arcade.Sprite):
+
+    def __init__(self, x, y):
+        super().__init__(filename="Bomb/Bomb_f00.png", scale=1)
+
+
+class Solid(arcade.Sprite):
+
+    def __init__(self):
+        super().__init__(filename="Blocks/SolidBlock.png", scale=1)
+
+
+window = Game(
+    TILE_SIZE * COLUMNS,
+    TILE_SIZE * ROWS,
+    SCREEN_TITLE)
 arcade.run()
