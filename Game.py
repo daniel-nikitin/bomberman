@@ -1,5 +1,6 @@
 import arcade
 
+from Bomb import BombG
 from Bomberman import Bomberman
 from Solid import Solid
 
@@ -16,6 +17,9 @@ class Game(arcade.Window):
         self.bomberman2 = Bomberman(0, 0, 1.5, (255, 0, 24))
         self.bg = arcade.load_texture('Blocks/BackgroundTile.png')
         self.solidlist = arcade.SpriteList()
+        self.bomblist = arcade.SpriteList()
+        self.bomblist2 = arcade.SpriteList()
+        self.flamelist = arcade.SpriteList()
         self.bombermen = arcade.SpriteList()
         # self.bombermen.append(Bomberman(width / 2, height / 2, P1_SPEED))
         self.create_solidB()
@@ -26,7 +30,10 @@ class Game(arcade.Window):
         self.solidlist.draw()
         self.bomberman1.draw()
         self.bomberman2.draw()
-        # self.bomberman.draw_hit_box()
+        self.bomberman1.draw_hit_box()
+        self.bomblist.draw()
+        self.bomblist2.draw()
+        self.flamelist.draw()
 
     def create_solidB(self):
         for y in range(10):
@@ -62,6 +69,11 @@ class Game(arcade.Window):
         if symbol == arcade.key.D:
             self.bomberman1.go_right()
 
+        if symbol == arcade.key.Q:
+            bomb = BombG(self.bomberman1.center_x, self.bomberman1.center_y)
+            self.bomblist.append(bomb)
+
+
         if symbol == arcade.key.UP:
             self.bomberman2.go_back()
 
@@ -74,6 +86,10 @@ class Game(arcade.Window):
         if symbol == arcade.key.RIGHT:
             self.bomberman2.go_right()
 
+        if symbol == arcade.key.RCTRL:
+            bomb = BombG(self.bomberman2.center_x, self.bomberman2.center_y)
+            self.bomblist2.append(bomb)
+
     def on_key_release(self, symbol: int, modifiers: int):
         if symbol == arcade.key.A or symbol == arcade.key.D or symbol == arcade.key.W or symbol == arcade.key.S:
             self.bomberman1.stop()
@@ -81,6 +97,8 @@ class Game(arcade.Window):
             self.bomberman2.stop()
 
     def update(self, delta_time: float):
+
+        self.bomblist.on_update(delta_time)
 
         list = [self.bomberman1, self.bomberman2]
         for i in list:
