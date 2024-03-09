@@ -100,6 +100,7 @@ class Game(arcade.Window):
     def update(self, delta_time: float):
 
         self.bomblist.on_update(delta_time)
+        self.bomblist2.on_update(delta_time)
         self.flamelist.on_update(delta_time)
 
         list = [self.bomberman1, self.bomberman2]

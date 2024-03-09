@@ -13,6 +13,7 @@ class BombG(arcade.Sprite):
         self.frame = 0
         self.time = 0
         self.flamelist = flamelist
+        self.radius = 3
 
         for i in range(0, 3):
             self.textures.append(arcade.load_texture(f"Bomb/Bomb_f0{i}.png"))
@@ -29,6 +30,23 @@ class BombG(arcade.Sprite):
 
         self.second_to_explode -= delta_time
         if self.second_to_explode < 0:
-            flame = FlameG(self.center_x, self.center_y)
-            self.flamelist.append(flame)
-            self.kill()
+            self.explode()
+
+    def explode(self):
+        flame = FlameG(self.center_x, self.center_y)
+        self.flamelist.append(flame)
+
+        for i in range(self.radius):
+            self.flamelist.append(
+                FlameG(self.center_x + flame.width * i, self.center_y)
+            )
+            self.flamelist.append(
+                FlameG(self.center_x - flame.width * i, self.center_y)
+            )
+            self.flamelist.append(
+                FlameG(self.center_x , self.center_y + flame.height * i)
+            )
+            self.flamelist.append(
+                FlameG(self.center_x , self.center_y - flame.height * i)
+            )
+        self.kill()
