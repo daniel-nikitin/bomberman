@@ -70,7 +70,8 @@ class Game(arcade.Window):
             self.bomberman1.go_right()
 
         if symbol == arcade.key.Q:
-            bomb = BombG(self.bomberman1.center_x, self.bomberman1.center_y)
+            bomb = BombG(self.bomberman1.center_x, self.bomberman1.center_y, self.flamelist)
+
             self.bomblist.append(bomb)
 
 
@@ -87,7 +88,7 @@ class Game(arcade.Window):
             self.bomberman2.go_right()
 
         if symbol == arcade.key.RCTRL:
-            bomb = BombG(self.bomberman2.center_x, self.bomberman2.center_y)
+            bomb = BombG(self.bomberman2.center_x, self.bomberman2.center_y, self.flamelist)
             self.bomblist2.append(bomb)
 
     def on_key_release(self, symbol: int, modifiers: int):
@@ -99,6 +100,7 @@ class Game(arcade.Window):
     def update(self, delta_time: float):
 
         self.bomblist.on_update(delta_time)
+        self.flamelist.on_update(delta_time)
 
         list = [self.bomberman1, self.bomberman2]
         for i in list:
