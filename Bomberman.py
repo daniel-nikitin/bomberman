@@ -1,5 +1,7 @@
 import arcade
 
+from Bomb import BombG
+
 
 class Bomberman(arcade.Sprite):
 
@@ -11,6 +13,8 @@ class Bomberman(arcade.Sprite):
         self.color = color
         self.pose = 0
         self.time = 0
+        self.bomb_disable = 10
+        self.cooldown = 0
         self.moving = False
         self.Left_poses_list = []
         self.Right_poses_list = []
@@ -38,6 +42,7 @@ class Bomberman(arcade.Sprite):
 
     def oopdate(self, delta_time: float):
 
+        self.cooldown  -= delta_time
         if self.moving:
             self.time += delta_time
             if self.time > 0.05:
@@ -82,3 +87,13 @@ class Bomberman(arcade.Sprite):
 
     def stop(self):
         self.moving = False
+
+    def place_bomb(self,  bomblist:arcade.SpriteList, flamelist: arcade.SpriteList):
+        if self.cooldown > 0:
+            return
+
+        bomblist.append(
+            BombG(self.center_x, self.center_y, flamelist)
+        )
+
+        self.cooldown = self.bomb_disable

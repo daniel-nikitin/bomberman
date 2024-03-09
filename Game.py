@@ -18,7 +18,6 @@ class Game(arcade.Window):
         self.bg = arcade.load_texture('Blocks/BackgroundTile.png')
         self.solidlist = arcade.SpriteList()
         self.bomblist = arcade.SpriteList()
-        self.bomblist2 = arcade.SpriteList()
         self.flamelist = arcade.SpriteList()
         self.bombermen = arcade.SpriteList()
         # self.bombermen.append(Bomberman(width / 2, height / 2, P1_SPEED))
@@ -32,7 +31,6 @@ class Game(arcade.Window):
         self.bomberman2.draw()
         self.bomberman1.draw_hit_box()
         self.bomblist.draw()
-        self.bomblist2.draw()
         self.flamelist.draw()
 
     def create_solidB(self):
@@ -70,9 +68,8 @@ class Game(arcade.Window):
             self.bomberman1.go_right()
 
         if symbol == arcade.key.Q:
-            bomb = BombG(self.bomberman1.center_x, self.bomberman1.center_y, self.flamelist)
+            self.bomberman1.place_bomb(self.bomblist, self.flamelist)
 
-            self.bomblist.append(bomb)
 
 
         if symbol == arcade.key.UP:
@@ -88,8 +85,8 @@ class Game(arcade.Window):
             self.bomberman2.go_right()
 
         if symbol == arcade.key.RCTRL:
-            bomb = BombG(self.bomberman2.center_x, self.bomberman2.center_y, self.flamelist)
-            self.bomblist2.append(bomb)
+            self.bomberman2.place_bomb(self.bomblist, self.flamelist)
+
 
     def on_key_release(self, symbol: int, modifiers: int):
         if symbol == arcade.key.A or symbol == arcade.key.D or symbol == arcade.key.W or symbol == arcade.key.S:
@@ -100,7 +97,6 @@ class Game(arcade.Window):
     def update(self, delta_time: float):
 
         self.bomblist.on_update(delta_time)
-        self.bomblist2.on_update(delta_time)
         self.flamelist.on_update(delta_time)
 
         list = [self.bomberman1, self.bomberman2]
