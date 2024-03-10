@@ -5,12 +5,13 @@ from Bomb import BombG
 
 class Bomberman(arcade.Sprite):
 
-    def __init__(self, x, y, speed, color):
+    def __init__(self, x, y, speed, color, flame_size):
         super().__init__(filename="Bomberman/Front/Bman_F_f00.png", scale=1)
         self.set_hit_box(((-24.0, -49.0), (-15.0, -58.0), (15.0, -58.0), (24.0, -49.0), (24.0, -20), (15.0, -11), (-15.0, -11), (-24.0, -20)))
         self.center_y = y
         self.center_x = x
         self.speed = speed
+        self.flame_size = flame_size
         self.color = color
         self.pose = 0
         self.time = 0
@@ -94,7 +95,7 @@ class Bomberman(arcade.Sprite):
             return
 
         bomblist.append(
-            BombG(self.center_x, self.center_y, flamelist)
+            BombG(self.center_x, self.center_y, flamelist, self.flame_size)
         )
 
         self.cooldown = self.bomb_disable
