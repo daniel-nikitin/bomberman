@@ -4,9 +4,9 @@ from Bomb import BombG
 from Bomberman import Bomberman
 from Solid import Solid
 
-ROWS = 7
-COLUMNS = 15
-TILE_SIZE = 90
+ROWS = 11
+COLUMNS = 11
+TILE_SIZE = 65
 
 
 
@@ -29,7 +29,6 @@ class Game(arcade.Window):
         self.solidlist.draw()
         self.bomberman1.draw()
         self.bomberman2.draw()
-        self.bomberman1.draw_hit_box()
         self.bomblist.draw()
         self.flamelist.draw()
 
