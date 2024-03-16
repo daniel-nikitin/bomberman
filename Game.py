@@ -4,6 +4,7 @@ import arcade
 
 from Bomb import BombG
 from Bomberman import Bomberman
+from Powerup import Powerup, PowerupType
 from Solid import Solid
 from expblock import Expblock
 
@@ -16,14 +17,18 @@ TILE_SIZE = 65
 class Game(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.bomberman1 = Bomberman(width / 2, height / 2, 2.5, (0, 255, 24), TILE_SIZE)
-        self.bomberman2 = Bomberman(0, 0, 1.5, (255, 0, 24), TILE_SIZE)
+        self.bomberman1 = Bomberman(width / 2, height / 2, (0, 255, 24), TILE_SIZE)
+        self.bomberman2 = Bomberman(0, 0,  (255, 0, 24), TILE_SIZE)
         self.bg = arcade.load_texture('Blocks/BackgroundTile.png')
         self.solidlist = arcade.SpriteList()
         self.explist = arcade.SpriteList()
         self.bomblist = arcade.SpriteList()
         self.flamelist = arcade.SpriteList()
         self.bombermen = arcade.SpriteList()
+        self.powerups = arcade.SpriteList()
+        new_powerup = Powerup(PowerupType.BOMB)
+        new_powerup = Powerup(PowerupType.FLAME)
+        new_powerup = Powerup(PowerupType.SPEED)
         # self.bombermen.append(Bomberman(width / 2, height / 2, P1_SPEED))
         self.create_solidB()
         self.create_expB()
@@ -32,6 +37,7 @@ class Game(arcade.Window):
         self.clear()
         self.draw_bg()
         self.solidlist.draw()
+        self.powerups.draw()
         self.explist.draw()
         self.bomberman1.draw()
         #self.bomberman1.draw_hit_box()
@@ -57,6 +63,17 @@ class Game(arcade.Window):
                         block.center_x = TILE_SIZE * x + TILE_SIZE / 2
                         block.center_y = TILE_SIZE * y + TILE_SIZE / 2
                         self.explist.append(block)
+                        self.maybe_place_powerup(block.center_x, block.center_y)
+
+    def maybe_place_powerup(self, x, y):
+        if random.randint(1, 2) == 1:
+            powerup_type = random.choice(list(PowerupType))
+
+            powerup = Powerup(powerup_type)
+            powerup.center_x = x
+            powerup.center_y = y
+
+            self.powerups.append(powerup)
 
     def draw_bg(self):
         for y in range(ROWS):
@@ -114,6 +131,8 @@ class Game(arcade.Window):
 
         self.bomblist.on_update(delta_time)
         self.flamelist.on_update(delta_time)
+        
+        self.check_flame_collision()
 
         bombermen = [self.bomberman1, self.bomberman2]
         for bomberman in bombermen:
@@ -130,12 +149,22 @@ class Game(arcade.Window):
             if bomberman.bottom < 0 and bomberman.navigation == 3:
                 bomberman.stop()
 
-            self.check_colliuson(self.solidlist, bomberman)
-            self.check_colliuson(self.explist, bomberman)
+            self.check_bomberman_collision(self.solidlist, bomberman)
+            self.check_bomberman_collision(self.explist, bomberman)
+
+            powerups = arcade.check_for_collision_with_list(bomberman, self.powerups)
+            for powerup in powerups:
+                bomberman.pick_up_powerup(powerup)
+                powerup.kill()
 
             bomberman.oopdate(delta_time)
 
-    def check_colliuson(self, spritelist, bomberman):
+    def check_flame_collision(self):
+        for expblock in self.explist:
+            flames = arcade.check_for_collision_with_list(expblock, self.flamelist)
+            if len(flames) > 0:
+                expblock.kill()
+    def check_bomberman_collision(self, spritelist, bomberman):
 
         blocks = arcade.check_for_collision_with_list(bomberman, spritelist)
         if len(blocks) > 0:

@@ -1,21 +1,26 @@
 import arcade
 
 from Bomb import BombG
+from Powerup import Powerup, PowerupType
 
 
 class Bomberman(arcade.Sprite):
 
-    def __init__(self, x, y, speed, color, flame_size):
+    def __init__(self, x, y, color, flame_size):
         super().__init__(filename="Bomberman/Front/Bman_F_f00.png", scale=1)
         self.set_hit_box(((-24.0, -49.0), (-15.0, -58.0), (15.0, -58.0), (24.0, -49.0), (24.0, -20), (15.0, -11), (-15.0, -11), (-24.0, -20)))
         self.center_y = y
         self.center_x = x
-        self.speed = speed
+
+        self.speed = 2
         self.flame_size = flame_size
+        self.bomb_disable = 10
+        self.radius = 3
+
         self.color = color
         self.pose = 0
         self.time = 0
-        self.bomb_disable = 10
+
         self.cooldown = 0
         self.moving = False
         self.Left_poses_list = []
@@ -67,6 +72,14 @@ class Bomberman(arcade.Sprite):
             if self.navigation == 4:
                 self.center_x = self.center_x - self.speed
 
+    def pick_up_powerup(self, powerup: Powerup):
+        if powerup.type == PowerupType.SPEED:
+            self.speed += 2
+        if powerup.type == PowerupType.BOMB:
+            self.bomb_disable -= 2
+        if powerup.type == PowerupType.FLAME:
+            self.radius += 2
+
     def go_back(self):
         self.navigation = 1
         self.move()
@@ -95,7 +108,7 @@ class Bomberman(arcade.Sprite):
             return
 
         bomblist.append(
-            BombG(self.center_x, self.center_y, flamelist, self.flame_size)
+            BombG(self.center_x, self.center_y, flamelist, self.flame_size, self.radius)
         )
 
         self.cooldown = self.bomb_disable

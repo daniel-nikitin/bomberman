@@ -5,7 +5,7 @@ from flame import FlameG
 
 class BombG(arcade.Sprite):
 
-    def __init__(self, x, y, flamelist: arcade.SpriteList, flame_size):
+    def __init__(self, x, y, flamelist: arcade.SpriteList, flame_size, radius):
         super().__init__(filename="Bomb/Bomb_f00.png", scale=1)
         self.center_x = x
         self.center_y = y
@@ -14,7 +14,7 @@ class BombG(arcade.Sprite):
         self.frame = 0
         self.time = 0
         self.flamelist = flamelist
-        self.radius = 3
+        self.radius = radius
 
         for i in range(0, 3):
             self.textures.append(arcade.load_texture(f"Bomb/Bomb_f0{i}.png"))
