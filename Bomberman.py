@@ -6,14 +6,13 @@ from Powerup import Powerup, PowerupType
 
 class Bomberman(arcade.Sprite):
 
-    def __init__(self, x, y, color, flame_size):
+    def __init__(self, x, y, color):
         super().__init__(filename="Bomberman/Front/Bman_F_f00.png", scale=1)
         self.set_hit_box(((-24.0, -49.0), (-15.0, -58.0), (15.0, -58.0), (24.0, -49.0), (24.0, -20), (15.0, -11), (-15.0, -11), (-24.0, -20)))
         self.center_y = y
         self.center_x = x
 
         self.speed = 2
-        self.flame_size = flame_size
         self.bomb_disable = 10
         self.radius = 3
 
@@ -103,12 +102,13 @@ class Bomberman(arcade.Sprite):
     def stop(self):
         self.moving = False
 
-    def place_bomb(self,  bomblist:arcade.SpriteList, flamelist: arcade.SpriteList):
+    def place_bomb(self, create_bomb):
         if self.cooldown > 0:
             return
 
-        bomblist.append(
-            BombG(self.center_x, self.center_y, flamelist, self.flame_size, self.radius)
+        create_bomb(
+            self.center_x, self.center_y,self.radius
         )
+
 
         self.cooldown = self.bomb_disable

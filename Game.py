@@ -7,18 +7,18 @@ from Bomberman import Bomberman
 from Powerup import Powerup, PowerupType
 from Solid import Solid
 from expblock import Expblock
+from flame import FlameG
 
 ROWS = 11
 COLUMNS = 17
 TILE_SIZE = 65
 
 
-
 class Game(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.bomberman1 = Bomberman(width / 2, height / 2, (0, 255, 24), TILE_SIZE)
-        self.bomberman2 = Bomberman(0, 0,  (255, 0, 24), TILE_SIZE)
+        self.bomberman1 = Bomberman(width / 2, height / 2, (0, 255, 24))
+        self.bomberman2 = Bomberman(0, 0, (255, 0, 24))
         self.bg = arcade.load_texture('Blocks/BackgroundTile.png')
         self.solidlist = arcade.SpriteList()
         self.explist = arcade.SpriteList()
@@ -26,10 +26,7 @@ class Game(arcade.Window):
         self.flamelist = arcade.SpriteList()
         self.bombermen = arcade.SpriteList()
         self.powerups = arcade.SpriteList()
-        new_powerup = Powerup(PowerupType.BOMB)
-        new_powerup = Powerup(PowerupType.FLAME)
-        new_powerup = Powerup(PowerupType.SPEED)
-        # self.bombermen.append(Bomberman(width / 2, height / 2, P1_SPEED))
+
         self.create_solidB()
         self.create_expB()
 
@@ -40,7 +37,7 @@ class Game(arcade.Window):
         self.powerups.draw()
         self.explist.draw()
         self.bomberman1.draw()
-        #self.bomberman1.draw_hit_box()
+        # self.bomberman1.draw_hit_box()
         self.bomberman2.draw()
         self.bomblist.draw()
         self.flamelist.draw()
@@ -101,9 +98,7 @@ class Game(arcade.Window):
             self.bomberman1.go_right()
 
         if symbol == arcade.key.Q:
-            self.bomberman1.place_bomb(self.bomblist, self.flamelist)
-
-
+            self.bomberman1.place_bomb(self.create_bomb)
 
         if symbol == arcade.key.UP:
             self.bomberman2.go_back()
@@ -118,8 +113,58 @@ class Game(arcade.Window):
             self.bomberman2.go_right()
 
         if symbol == arcade.key.RCTRL:
-            self.bomberman2.place_bomb(self.bomblist, self.flamelist)
+            self.bomberman2.place_bomb(self.create_bombs)
 
+    def create_bomb(self, x, y, radius):
+        bomb = BombG(x, y, radius, self.explode)
+        self.bomblist.append(bomb)
+
+    def explode(self, x, y, radius):
+
+        right_collision = False
+        left_collision = False
+        front_collision = False
+        back_collision = False
+
+        for i in range(radius):
+            right_flame = FlameG(x + TILE_SIZE * i, y)
+            if self.check_flame_with_solid_collision(right_flame):
+                right_collision = True
+            if not right_collision:
+                self.flamelist.append(right_flame)
+
+            left_flame = FlameG(x - TILE_SIZE * i, y)
+            if self.check_flame_with_solid_collision(left_flame):
+                left_collision = True
+            if not left_collision:
+                self.flamelist.append(left_flame)
+
+            front_flame = FlameG(x, y - TILE_SIZE * i)
+            if self.check_flame_with_solid_collision(front_flame):
+                front_collision = True
+            if not front_collision:
+                self.flamelist.append(front_flame)
+
+            back_flame = FlameG(x, y + TILE_SIZE * i)
+            if self.check_flame_with_solid_collision(back_flame):
+                back_collision = True
+            if not back_collision:
+                self.flamelist.append(back_flame)
+
+
+
+            # self.flamelist.append(
+            #     FlameG(x - TILE_SIZE * i, y)
+            # )
+            # self.flamelist.append(
+            #     FlameG(x, y + TILE_SIZE * i)
+            # )
+            # self.flamelist.append(
+            #     FlameG(x, y - TILE_SIZE * i)
+            # )
+
+    def check_flame_with_solid_collision(self, flame):
+        return len(arcade.check_for_collision_with_list(flame, self.solidlist)) > 0
 
     def on_key_release(self, symbol: int, modifiers: int):
         if symbol == arcade.key.A or symbol == arcade.key.D or symbol == arcade.key.W or symbol == arcade.key.S:
@@ -131,7 +176,7 @@ class Game(arcade.Window):
 
         self.bomblist.on_update(delta_time)
         self.flamelist.on_update(delta_time)
-        
+
         self.check_flame_collision()
 
         bombermen = [self.bomberman1, self.bomberman2]
@@ -164,6 +209,7 @@ class Game(arcade.Window):
             flames = arcade.check_for_collision_with_list(expblock, self.flamelist)
             if len(flames) > 0:
                 expblock.kill()
+
     def check_bomberman_collision(self, spritelist, bomberman):
 
         blocks = arcade.check_for_collision_with_list(bomberman, spritelist)
@@ -184,4 +230,3 @@ class Game(arcade.Window):
                     bomberman.stop()
             # arcade.colli
             # self.bomberman.stop()
-
