@@ -127,7 +127,12 @@ class Game(arcade.Window):
             self.bomberman2.place_bomb(self.create_bomb)
 
     def create_bomb(self, x, y, radius):
-        bomb = BombG(x, y, radius, self.explode)
+        bomb = BombG(
+            (x/TILE_SIZE).__round__()*TILE_SIZE+TILE_SIZE/2,
+            (y/TILE_SIZE).__round__()*TILE_SIZE-TILE_SIZE/2,
+            radius,
+            self.explode
+        )
         self.bomblist.append(bomb)
 
     def explode(self, x, y, radius):
@@ -143,24 +148,32 @@ class Game(arcade.Window):
                 right_collision = True
             if not right_collision:
                 self.flamelist.append(right_flame)
+                if self.check_flame_with_exp_collision(right_flame):
+                    right_collision = True
 
             left_flame = FlameG(x - TILE_SIZE * i, y)
             if self.check_flame_with_solid_collision(left_flame):
                 left_collision = True
             if not left_collision:
                 self.flamelist.append(left_flame)
+                if self.check_flame_with_exp_collision(left_flame):
+                    left_collision = True
 
             front_flame = FlameG(x, y - TILE_SIZE * i)
             if self.check_flame_with_solid_collision(front_flame):
                 front_collision = True
             if not front_collision:
                 self.flamelist.append(front_flame)
+                if self.check_flame_with_exp_collision(front_flame):
+                    front_collision = True
 
             back_flame = FlameG(x, y + TILE_SIZE * i)
             if self.check_flame_with_solid_collision(back_flame):
                 back_collision = True
             if not back_collision:
                 self.flamelist.append(back_flame)
+                if self.check_flame_with_exp_collision(back_flame):
+                    back_collision = True
 
 
 
@@ -176,6 +189,8 @@ class Game(arcade.Window):
 
     def check_flame_with_solid_collision(self, flame):
         return len(arcade.check_for_collision_with_list(flame, self.solidlist)) > 0
+    def check_flame_with_exp_collision(self, flame):
+        return len(arcade.check_for_collision_with_list(flame, self.explist)) > 0
 
     def on_key_release(self, symbol: int, modifiers: int):
         if symbol == arcade.key.A or symbol == arcade.key.D or symbol == arcade.key.W or symbol == arcade.key.S:
