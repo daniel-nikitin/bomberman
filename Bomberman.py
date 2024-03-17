@@ -77,7 +77,7 @@ class Bomberman(arcade.Sprite):
         if powerup.type == PowerupType.BOMB:
             self.bomb_disable -= 2
         if powerup.type == PowerupType.FLAME:
-            self.radius += 2
+            self.radius += 1
 
     def go_back(self):
         self.navigation = 1

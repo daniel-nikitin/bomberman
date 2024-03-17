@@ -20,6 +20,9 @@ class Game(arcade.Window):
         self.bomberman1 = Bomberman(width / 2, height / 2, (0, 255, 24))
         self.bomberman2 = Bomberman(0, 0, (255, 0, 24))
         self.bg = arcade.load_texture('Blocks/BackgroundTile.png')
+        self.pause = False
+        self.Gover_image = arcade.load_texture("win/win2.png")
+        self.stategame = True
         self.solidlist = arcade.SpriteList()
         self.explist = arcade.SpriteList()
         self.bomblist = arcade.SpriteList()
@@ -31,6 +34,7 @@ class Game(arcade.Window):
         self.create_expB()
 
     def on_draw(self):
+
         self.clear()
         self.draw_bg()
         self.solidlist.draw()
@@ -41,6 +45,10 @@ class Game(arcade.Window):
         self.bomberman2.draw()
         self.bomblist.draw()
         self.flamelist.draw()
+
+        if self.stategame == False:
+                arcade.draw_texture_rectangle(TILE_SIZE * COLUMNS / 2, TILE_SIZE * ROWS / 2, self.Gover_image.width,
+                                      self.Gover_image.height, self.Gover_image)
 
     def create_solidB(self):
         for y in range(ROWS):
@@ -85,6 +93,9 @@ class Game(arcade.Window):
 
     def on_key_press(self, symbol: int, modifiers: int):
 
+        if self.stategame == False:
+            return
+
         if symbol == arcade.key.W:
             self.bomberman1.go_back()
 
@@ -113,7 +124,7 @@ class Game(arcade.Window):
             self.bomberman2.go_right()
 
         if symbol == arcade.key.RCTRL:
-            self.bomberman2.place_bomb(self.create_bombs)
+            self.bomberman2.place_bomb(self.create_bomb)
 
     def create_bomb(self, x, y, radius):
         bomb = BombG(x, y, radius, self.explode)
@@ -174,10 +185,15 @@ class Game(arcade.Window):
 
     def update(self, delta_time: float):
 
+        if self.stategame == False:
+            return
+
         self.bomblist.on_update(delta_time)
         self.flamelist.on_update(delta_time)
 
         self.check_flame_collision()
+        self.check_collision(self.bomberman1)
+        self.check_collision(self.bomberman2)
 
         bombermen = [self.bomberman1, self.bomberman2]
         for bomberman in bombermen:
@@ -228,5 +244,17 @@ class Game(arcade.Window):
 
                 if bomberman.bottom < block.top < bomberman.top and bomberman.navigation == 3:
                     bomberman.stop()
-            # arcade.colli
-            # self.bomberman.stop()
+
+
+    def check_collision(self, players):
+
+        check = arcade.check_for_collision_with_list(players, self.flamelist)
+        #check = arcade.check_for_collision_with_list(self.bomberman2, self.flamelist)
+        if len(check) > 0:
+            self.stategame = False
+
+
+
+
+
+
