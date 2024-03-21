@@ -17,12 +17,14 @@ TILE_SIZE = 65
 class Game(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.bomberman1 = Bomberman(width / 2, height / 2, (0, 255, 24))
-        self.bomberman2 = Bomberman(0, 0, (255, 0, 24))
+        self.bomberman1 = Bomberman(width / 2, height / 2, (0, 255, 24), 2)
+        self.bomberman2 = Bomberman(0, 0, (255, 0, 24), 1)
         self.bg = arcade.load_texture('Blocks/BackgroundTile.png')
         self.pause = False
-        self.Gover_image = arcade.load_texture("win/win2.png")
+        self.Gover_image = arcade.load_texture("win/win1.png")
+        self.Gover_image2 = arcade.load_texture("win/win2.png")
         self.stategame = True
+        self.winner = -1
         self.solidlist = arcade.SpriteList()
         self.explist = arcade.SpriteList()
         self.bomblist = arcade.SpriteList()
@@ -47,8 +49,19 @@ class Game(arcade.Window):
         self.flamelist.draw()
 
         if self.stategame == False:
-                arcade.draw_texture_rectangle(TILE_SIZE * COLUMNS / 2, TILE_SIZE * ROWS / 2, self.Gover_image.width,
-                                      self.Gover_image.height, self.Gover_image)
+            if self.winner == 1:
+                image = self.Gover_image
+            else:
+                image = self.Gover_image2
+
+            arcade.draw_texture_rectangle(
+                TILE_SIZE * COLUMNS / 2,
+                TILE_SIZE * ROWS / 2,
+                self.Gover_image.width,
+                self.Gover_image.height,
+                image
+
+            )
 
     def create_solidB(self):
         for y in range(ROWS):
@@ -128,8 +141,8 @@ class Game(arcade.Window):
 
     def create_bomb(self, x, y, radius):
         bomb = BombG(
-            (x/TILE_SIZE).__round__()*TILE_SIZE+TILE_SIZE/2,
-            (y/TILE_SIZE).__round__()*TILE_SIZE-TILE_SIZE/2,
+            (x / TILE_SIZE).__floor__() * TILE_SIZE + TILE_SIZE / 2,
+            (y / TILE_SIZE).__round__() * TILE_SIZE - TILE_SIZE / 2,
             radius,
             self.explode
         )
@@ -175,8 +188,6 @@ class Game(arcade.Window):
                 if self.check_flame_with_exp_collision(back_flame):
                     back_collision = True
 
-
-
             # self.flamelist.append(
             #     FlameG(x - TILE_SIZE * i, y)
             # )
@@ -189,6 +200,7 @@ class Game(arcade.Window):
 
     def check_flame_with_solid_collision(self, flame):
         return len(arcade.check_for_collision_with_list(flame, self.solidlist)) > 0
+
     def check_flame_with_exp_collision(self, flame):
         return len(arcade.check_for_collision_with_list(flame, self.explist)) > 0
 
@@ -260,16 +272,10 @@ class Game(arcade.Window):
                 if bomberman.bottom < block.top < bomberman.top and bomberman.navigation == 3:
                     bomberman.stop()
 
+    def check_collision(self, bomberman:Bomberman):
 
-    def check_collision(self, players):
-
-        check = arcade.check_for_collision_with_list(players, self.flamelist)
-        #check = arcade.check_for_collision_with_list(self.bomberman2, self.flamelist)
+        check = arcade.check_for_collision_with_list(bomberman, self.flamelist)
+        # check = arcade.check_for_collision_with_list(self.bomberman2, self.flamelist)
         if len(check) > 0:
             self.stategame = False
-
-
-
-
-
-
+            self.winner = bomberman.number

@@ -6,8 +6,9 @@ from Powerup import Powerup, PowerupType
 
 class Bomberman(arcade.Sprite):
 
-    def __init__(self, x, y, color):
+    def __init__(self, x, y, color, number):
         super().__init__(filename="Bomberman/Front/Bman_F_f00.png", scale=1)
+        self.number = number
         self.set_hit_box(((-24.0, -49.0), (-15.0, -58.0), (15.0, -58.0), (24.0, -49.0), (24.0, -20), (15.0, -11), (-15.0, -11), (-24.0, -20)))
         self.center_y = y
         self.center_x = x
